@@ -1,0 +1,22 @@
+{
+  "name": "azure-function-db-sync",
+  "version": "1.0.0",
+  "description": "Azure Functions with dual database sync using Sequelize",
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.0.0",
+    "sequelize": "^6.37.1",
+    "tedious": "^16.7.0",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "durable-functions": "^2.1.0",
+    "moment": "^2.30.1",
+    "dotenv": "^16.4.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

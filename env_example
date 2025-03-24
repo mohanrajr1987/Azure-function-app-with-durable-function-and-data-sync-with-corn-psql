@@ -1,0 +1,24 @@
+# First Database Configuration (MSSQL)
+DB1_NAME=db1_name
+DB1_USER=your_username
+DB1_PASSWORD=your_password
+DB1_HOST=your_host
+DB1_PORT=1433
+
+# Second Database Configuration (MSSQL)
+DB2_NAME=db2_name
+DB2_USER=your_username
+DB2_PASSWORD=your_password
+DB2_HOST=your_host
+DB2_PORT=1433
+
+# PostgreSQL Fallback Configuration
+PG_HOST=localhost
+PG_PORT=5432
+PG_USERNAME=postgres
+PG_PASSWORD=password
+PG_DB1_NAME=db1_name
+PG_DB2_NAME=db2_name
+
+# Azure Function Configuration
+AzureWebJobsStorage=your_storage_connection_string
