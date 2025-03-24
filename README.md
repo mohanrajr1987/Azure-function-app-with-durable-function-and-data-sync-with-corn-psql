@@ -214,9 +214,136 @@ The application includes comprehensive error handling:
 - Not found errors
 - Server errors with detailed logging
 
-## Development
+## Azure Durable Functions Architecture
 
-To run the application locally:
+### Overview
+Azure Durable Functions is an extension of Azure Functions that enables you to write stateful functions in a serverless compute environment. In our application, we use it to orchestrate the product synchronization process between databases.
+
+### Components
+
+1. **Client Function (`StartProductSync/index.js`)**
+   - HTTP-triggered function that starts the orchestration
+   - Returns an orchestration instance ID for status tracking
+   - Endpoint: `POST /api/start-product-sync/ProductSyncOrchestrator`
+
+2. **Orchestrator Function (`ProductSyncOrchestrator/index.js`)**
+   - Coordinates the execution of activity functions
+   - Maintains state and handles failures
+   - Sequence:
+     1. Gets products from source database
+     2. For each product, calls sync activity
+     3. Returns sync results
+
+3. **Activity Functions**
+   - `GetProducts/index.js`: Retrieves products from source database
+   - `SyncProduct/index.js`: Syncs individual product to target database
+
+### Data Flow
+
+```mermaid
+graph TD
+    A[Client] -->|HTTP POST| B[StartProductSync]
+    B -->|Start Orchestration| C[ProductSyncOrchestrator]
+    C -->|Get Products| D[GetProducts Activity]
+    D -->|Return Products| C
+    C -->|For each product| E[SyncProduct Activity]
+    E -->|Update Product| F[(Target Database)]
+    E -->|Sync Result| C
+    C -->|Final Status| B
+    B -->|Instance ID| A
+```
+
+### State Management
+- Orchestrator maintains execution history
+- Automatic checkpointing after each activity
+- Replay-safe execution for reliability
+
+## Development Guide
+
+### Setting Up Local Development
+
+1. **Prerequisites Installation**:
+   ```bash
+   # Install Azure Functions Core Tools
+   npm install -g azure-functions-core-tools@4
+   
+   # Install Azurite for local storage emulation
+   npm install -g azurite
+   ```
+
+2. **Environment Configuration**:
+   ```bash
+   # Copy environment template
+   cp .env.example .env
+   
+   # Update database configurations in .env
+   ```
+
+3. **Database Setup**:
+   ```bash
+   # Initialize and seed database
+   npm run db:reset
+   ```
+
+### Creating New Functions
+
+1. **HTTP-Triggered Function**:
+   ```bash
+   func new --name MyNewFunction --template "HTTP trigger" --authlevel "anonymous"
+   ```
+
+2. **Durable Function Components**:
+   ```bash
+   # Create orchestrator
+   func new --name MyOrchestrator --template "Durable Functions orchestrator"
+   
+   # Create activity function
+   func new --name MyActivity --template "Durable Functions activity"
+   ```
+
+### Testing Functions
+
+1. **Start Local Environment**:
+   ```bash
+   # Start Azurite in background
+   azurite --silent --location /tmp/azurite --debug /tmp/azurite/debug.log &
+   
+   # Start function app
+   npm start
+   ```
+
+2. **Testing Endpoints**:
+   - Use provided curl commands in API Documentation
+   - Monitor function logs in console
+   - Check Azurite debug logs for storage operations
+
+### Best Practices
+
+1. **Durable Functions**:
+   - Keep orchestrator functions pure and deterministic
+   - Move external calls to activity functions
+   - Handle timeouts and retries appropriately
+   - Use sub-orchestrations for complex workflows
+
+2. **Error Handling**:
+   - Implement proper error handling in activity functions
+   - Use try-catch blocks in orchestrators
+   - Log errors with sufficient context
+   - Return meaningful error messages
+
+3. **Database Operations**:
+   - Use transactions where appropriate
+   - Implement proper connection pooling
+   - Handle database failover scenarios
+   - Validate data before operations
+
+4. **Monitoring**:
+   - Use application insights for production
+   - Monitor orchestration status
+   - Track database performance
+   - Set up alerts for failures
+
+## Running the Application
 
 1. Start Azurite:
    ```bash
