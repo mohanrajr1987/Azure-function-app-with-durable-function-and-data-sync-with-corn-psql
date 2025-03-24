@@ -4,7 +4,11 @@
   "description": "Azure Functions with dual database sync using Sequelize",
   "scripts": {
     "start": "func start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:init": "node scripts/initDb.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:seed": "node scripts/seed.js",
+    "db:reset": "npm run db:init && npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
